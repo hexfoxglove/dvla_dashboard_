@@ -2,7 +2,9 @@
 import requests
 
 # Your Firebase Web API Key (from firebaseConfig)
-API_KEY = st.secrets["API_KEY"]
+import streamlit as st
+
+API_KEY = st.secrets["firebase"]["apiKey"]
 
 # Base URLs for Firebase Identity Toolkit REST API
 SIGNUP_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={API_KEY}"
