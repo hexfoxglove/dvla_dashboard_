@@ -1,8 +1,11 @@
 # firebase_config.py
-import firebase_admin
-from firebase_admin import credentials, auth
+import streamlit as st
 
-# Load service account key (downloaded from Firebase Console)
-cred = credentials.Certificate("firebase_secret.json")
-firebase_admin.initialize_app(cred)
-
+firebase_config = {
+    "apiKey": st.secrets["firebase"]["apiKey"],
+    "authDomain": st.secrets["firebase"]["authDomain"],
+    "projectId": st.secrets["firebase"]["projectId"],
+    "storageBucket": st.secrets["firebase"]["storageBucket"],
+    "messagingSenderId": st.secrets["firebase"]["messagingSenderId"],
+    "appId": st.secrets["firebase"]["appId"]
+}
