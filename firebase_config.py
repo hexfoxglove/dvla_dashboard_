@@ -1,14 +1,8 @@
+# firebase_config.py
 import firebase_admin
-from firebase_admin import credentials, firestore
-import json
-import streamlit as st
+from firebase_admin import credentials, auth
 
-def get_db():
-    if not firebase_admin._apps:
-        sa = json.loads(st.secrets["FIREBASE_SERVICE_ACCOUNT"])
-        cred = credentials.Certificate(sa)
-        firebase_admin.initialize_app(cred)
-    return firestore.client()
+# Load service account key (downloaded from Firebase Console)
+cred = credentials.Certificate("firebase_secret.json")
+firebase_admin.initialize_app(cred)
 
-# convenient global
-db = get_db()
