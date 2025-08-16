@@ -1,3 +1,4 @@
+%%writefile main.py
 import streamlit as st
 from customer_portal import show as customer_dashboard
 from dvla_admin_portal import show as dvla_dashboard
@@ -8,11 +9,13 @@ if "user" not in st.session_state:
 if "role" not in st.session_state:
     st.session_state.role = None
 if "accounts" not in st.session_state:
-    # Dummy accounts: {username: {"password": ..., "role": ...}}
     st.session_state.accounts = {
         "customer": {"password": "1234", "role": "customer"},
         "agent": {"password": "4321", "role": "agent"},
     }
+if "invite_codes" not in st.session_state:
+    # Pre-generated codes for agent signup
+    st.session_state.invite_codes = ["AGENT2025", "DVLAAGENT1"]
 
 # --- Login page ---
 def login():
@@ -47,12 +50,27 @@ def login():
             elif not username or not password:
                 st.error("Please enter both username and password.")
             else:
+                # Agent signup requires invite code
+                if role == "DVLA Agent":
+                    invite = st.text_input("Enter Agent Invite Code")
+                    if invite not in st.session_state.invite_codes:
+                        st.error("Invalid or missing invite code. Ask admin for a valid code.")
+                        return
+                    else:
+                        # consume invite code
+                        st.session_state.invite_codes.remove(invite)
+
                 st.session_state.accounts[username] = {
                     "password": password,
                     "role": "customer" if role == "Customer" else "agent"
                 }
-                st.success("Account created successfully! Please log in.")
-                st.info("Now switch to 'Login' above to access your account.")
+                st.success("Account created successfully!")
+                if role == "Customer":
+                    st.info("Now switch to 'Login' above to access your account.")
+                else:
+                    st.info("Agent account created. Please log in with your credentials.")
+
+
 
 # --- Logout ---
 def logout():
@@ -63,7 +81,7 @@ def logout():
 
 # --- Main app routing ---
 if st.session_state.user:
-    logout()
+    logout()  # show logout button in sidebar
     if st.session_state.role == "customer":
         customer_dashboard()
     elif st.session_state.role == "agent":
