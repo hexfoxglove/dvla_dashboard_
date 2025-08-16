@@ -1,4 +1,3 @@
-%%writefile main.py
 import streamlit as st
 from customer_portal import show as customer_dashboard
 from dvla_admin_portal import show as dvla_dashboard
