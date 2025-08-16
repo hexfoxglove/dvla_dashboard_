@@ -1,31 +1,36 @@
 # main.py
+# main.py
 import streamlit as st
 from auth import login, signup
 
-st.title("DVLA Dashboard 🚗")
+st.set_page_config(page_title="DVLA Dashboard", layout="centered")
 
-menu = ["Login", "Sign Up"]
-choice = st.sidebar.selectbox("Menu", menu)
+st.title("DVLA Dashboard")
 
-if choice == "Sign Up":
-    st.subheader("Create New Account")
+# Page switcher
+page = st.sidebar.selectbox("Choose Page", ["Login", "Signup"])
+
+if page == "Login":
+    st.subheader("Login")
     email = st.text_input("Email")
     password = st.text_input("Password", type="password")
-    if st.button("Sign Up"):
-        result = signup(email, password)
-        if "error" in result:
-            st.error(result["error"]["message"])
-        else:
-            st.success("Account created successfully!")
 
-elif choice == "Login":
-    st.subheader("Login to Your Account")
-    email = st.text_input("Email")
-    password = st.text_input("Password", type="password")
     if st.button("Login"):
-        result = login(email, password)
-        if "error" in result:
-            st.error(result["error"]["message"])
+        user = login(email, password)
+        if user:
+            st.success("Logged in successfully!")
         else:
-            st.success("Login successful!")
-            st.write("User Info:", result)
+            st.error("Invalid credentials. Try again.")
+
+elif page == "Signup":
+    st.subheader("Create an Account")
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Signup"):
+        user = signup(email, password)
+        if user:
+            st.success("Account created successfully! You can now log in.")
+        else:
+            st.error("Signup failed. Try again.")
+
