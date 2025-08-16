@@ -6,45 +6,32 @@ import streamlit as st
 
 API_KEY = st.secrets["firebase"]["apiKey"]
 
-# Base URLs for Firebase Identity Toolkit REST API
+# Firebase endpoints
 SIGNUP_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={API_KEY}"
 LOGIN_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={API_KEY}"
-USERINFO_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:lookup?key={API_KEY}"
 
-def signup(email: str, password: str):
-    """
-    Create a new Firebase Auth user with email + password.
-    Returns dict with idToken, refreshToken, localId if successful.
-    """
+def signup(email, password):
     payload = {
         "email": email,
         "password": password,
         "returnSecureToken": True
     }
-    response = requests.post(SIGNUP_URL, json=payload)
-    return response.json()
+    response = requests.post(SIGNUP_URL, data=payload)
+    if response.status_code == 200:
+        return response.json()  # contains idToken, refreshToken, etc.
+    else:
+        st.error(response.json().get("error", {}).get("message", "Signup failed"))
+        return None
 
-def login(email: str, password: str):
-    """
-    Log in existing Firebase Auth user.
-    Returns dict with idToken, refreshToken, localId if successful.
-    """
+def login(email, password):
     payload = {
         "email": email,
         "password": password,
         "returnSecureToken": True
     }
-    response = requests.post(LOGIN_URL, json=payload)
-    return response.json()
-
-def get_user_info(id_token: str):
-    """
-    Fetch user profile info using their ID token.
-    Useful after login to confirm email, uid, etc.
-    """
-    payload = {
-        "idToken": id_token
-    }
-    response = requests.post(USERINFO_URL, json=payload)
-    return response.json()
-
+    response = requests.post(LOGIN_URL, data=payload)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        st.error(response.json().get("error", {}).get("message", "Login failed"))
+        return None
